@@ -1,10 +1,8 @@
 export default async function handler(req, res) {
-  // GitHub Pages からのアクセスを許可
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "https://napoleonpie.github.io");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // 事前確認リクエストへの対応
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -31,7 +29,6 @@ ${question}
 ${answer}
 
 必ず次のJSONだけで返してください。
-
 {
   "score": 0,
   "comment": "良い点と改善点を日本語で具体的に書く",
@@ -52,10 +49,21 @@ ${answer}
     });
 
     const data = await openaiRes.json();
+
+    if (!openaiRes.ok) {
+      return res.status(500).json({
+        error: "OpenAI API error",
+        detail: data
+      });
+    }
+
     const text = data.output_text;
 
     if (!text) {
-      return res.status(500).json({ error: "AI response was empty", raw: data });
+      return res.status(500).json({
+        error: "AI response was empty",
+        raw: data
+      });
     }
 
     const result = JSON.parse(text);
