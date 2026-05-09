@@ -14,13 +14,9 @@ export default async function handler(req, res) {
   try {
     const { question, answer } = req.body;
 
-    if (!question || !answer) {
-      return res.status(400).json({ error: "question and answer are required" });
-    }
-
     const prompt = `
 あなたは財務部員育成のAIトレーナーです。
-以下の問題に対する回答を、財務部員の実務力という観点で採点してください。
+以下の問題に対する回答を採点してください。
 
 【問題】
 ${question}
@@ -28,11 +24,11 @@ ${question}
 【回答】
 ${answer}
 
-必ず次のJSONだけで返してください。
+必ずJSONだけで返してください。
 {
-  "score": 0,
-  "comment": "良い点と改善点を日本語で具体的に書く",
-  "modelAnswer": "財務部員としての模範回答を日本語で書く"
+  "score": 80,
+  "comment": "良い点と改善点",
+  "modelAnswer": "模範回答"
 }
 `;
 
@@ -50,23 +46,28 @@ ${answer}
 
     const data = await openaiRes.json();
 
-    if (!openaiRes.ok) {
-      return res.status(500).json({
-        error: "OpenAI API error",
-        detail: data
-      });
-    }
-
-    const text = data.output_text;
+    const text =
+      data.output?.[0]?.content?.[0]?.text ||
+      data.output_text;
 
     if (!text) {
       return res.status(500).json({
-        error: "AI response was empty",
+        error: "AI response empty",
         raw: data
       });
     }
 
-    const result = JSON.parse(text);
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      return res.status(500).json({
+        error: "JSON parse failed",
+        raw: text
+      });
+    }
+
     return res.status(200).json(result);
 
   } catch (error) {
