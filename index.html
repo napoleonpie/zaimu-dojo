@@ -92,109 +92,138 @@
   </div>
 
   <script>
-    const questions = [
+    <script>
+
+const questions = [
+  {
+    text: "銀行から『最近の資金繰り状況はいかがですか？』と聞かれました。30秒で回答してください。"
+  },
+  {
+    text: "『借入金利はどのように決まりますか？』と聞かれました。"
+  },
+  {
+    text: "『コベナンツとは何ですか？』と聞かれました。"
+  }
+];
+
+let currentQuestionIndex = 0;
+let exp = Number(localStorage.getItem("exp")) || 0;
+let level = Number(localStorage.getItem("level")) || 1;
+
+function updateStatus() {
+  document.getElementById("exp").textContent = exp;
+  document.getElementById("level").textContent = level;
+
+  localStorage.setItem("exp", exp);
+  localStorage.setItem("level", level);
+}
+
+function showQuestion() {
+  document.getElementById("question").textContent =
+    questions[currentQuestionIndex].text;
+
+  document.getElementById("answer").value = "";
+
+  document.getElementById("result").textContent =
+    "回答すると、ここに採点結果が表示されます。";
+}
+
+async function gradeAnswer() {
+
+  const answer =
+    document.getElementById("answer").value;
+
+  const question =
+    questions[currentQuestionIndex].text;
+
+  if (answer.trim() === "") {
+
+    document.getElementById("result").textContent =
+      "まずは回答を書いてください。";
+
+    return;
+  }
+
+  document.getElementById("result").textContent =
+    "AIトレーナーが採点中です...";
+
+  try {
+
+    const response = await fetch(
+      "https://zaimu-dojo-asogrkfoz-che2secake-s-projects.vercel.app/",
       {
-        text: "銀行から『最近の資金繰り状況はいかがですか？』と聞かれました。30秒で回答してください。",
-        keywords: ["資金繰り", "現預金", "借入", "支払", "余裕", "運転資金"]
-      },
-      {
-        text: "銀行から『人件費が横ばいの理由は何ですか？』と聞かれました。財務部員として回答してください。",
-        keywords: ["ベースアップ", "人員", "退職", "採用", "残業", "賞与", "横ばい"]
-      },
-      {
-        text: "『借入金利はどのように決まりますか？』と聞かれました。基準金利とスプレッドを使って説明してください。",
-        keywords: ["基準金利", "スプレッド", "TIBOR", "TONA", "短プラ", "信用力"]
-      },
-      {
-        text: "『コベナンツとは何ですか？』と聞かれました。初心者にも分かるように説明してください。",
-        keywords: ["財務制限条項", "約束", "EBITDA", "自己資本", "違反", "銀行"]
-      },
-      {
-        text: "『EBITDA倍率が高いとはどういう意味ですか？』と聞かれました。回答してください。",
-        keywords: ["有利子負債", "EBITDA", "返済能力", "倍率", "財務負担"]
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          question: question,
+          answer: answer
+        })
       }
-    ];
+    );
 
-    let currentQuestionIndex = 0;
-    let exp = Number(localStorage.getItem("exp")) || 0;
-    let level = Number(localStorage.getItem("level")) || 1;
+    const result = await response.json();
 
-    function updateStatus() {
-      document.getElementById("exp").textContent = exp;
-      document.getElementById("level").textContent = level;
+    const score = result.score;
 
-      let title = "見習い財務部員";
-      if (level >= 3) title = "銀行対応担当";
-      if (level >= 5) title = "資金繰りマスター";
-      if (level >= 8) title = "財務参謀";
-      document.getElementById("title").textContent = title;
+    let image = "trainer_normal.png";
 
-      localStorage.setItem("exp", exp);
-      localStorage.setItem("level", level);
+    if (score >= 90) {
+      image = "trainer_great.png";
+    }
+    else if (score >= 75) {
+      image = "trainer_good.png";
+    }
+    else if (score >= 55) {
+      image = "trainer_soso.png.jpeg";
+    }
+    else {
+      image = "trainer_bad.png.png";
     }
 
-    function showQuestion() {
-      document.getElementById("question").textContent = questions[currentQuestionIndex].text;
-      document.getElementById("answer").value = "";
-      document.getElementById("result").textContent = "回答すると、ここに採点結果が表示されます。";
-      document.getElementById("trainerImage").src = "img/trainer_normal.png";
-    }
+    document.getElementById("trainerImage").src = image;
 
-    function gradeAnswer() {
-      const answer = document.getElementById("answer").value;
-      const q = questions[currentQuestionIndex];
+    exp += Math.round(score / 5);
 
-      if (answer.trim() === "") {
-        document.getElementById("result").textContent = "まずは回答を書いてください。";
-        return;
-      }
-
-      let hit = 0;
-      q.keywords.forEach(word => {
-        if (answer.includes(word)) hit++;
-      });
-
-      let score = Math.min(100, Math.round((hit / q.keywords.length) * 80 + Math.min(answer.length / 5, 20)));
-
-      let comment = "";
-      let image = "img/trainer_normal.png";
-
-      if (score >= 90) {
-        comment = "素晴らしいです。実務でもかなり使える回答です。要点が整理されており、銀行への説明力も高いです。";
-        image = "img/trainer_great.png";
-      } else if (score >= 75) {
-        comment = "良い回答です。主要な論点は押さえられています。もう少し数字や具体例を入れると、さらに説得力が増します。";
-        image = "img/trainer_good.png";
-      } else if (score >= 55) {
-        comment = "方向性は悪くありません。ただし、財務部員としては少し抽象的です。キーワードを意識して、より具体的に答えましょう。";
-        image = "img/trainer_soso.png";
-      } else {
-        comment = "惜しいです。まずは基本用語を入れて、銀行が聞きたいポイントに答える意識を持ちましょう。";
-        image = "img/trainer_bad.png";
-      }
-
-      exp += Math.round(score / 5);
-      if (exp >= 100) {
-        level++;
-        exp -= 100;
-        comment += "\n\nレベルアップしました！";
-      }
-
-      document.getElementById("trainerImage").src = image;
-
-      document.getElementById("result").textContent =
-        `スコア：${score}点\n\n講評：\n${comment}\n\n拾えた重要キーワード：${hit} / ${q.keywords.length}`;
-
-      updateStatus();
-    }
-
-    function nextQuestion() {
-      currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
-      showQuestion();
+    if (exp >= 100) {
+      level++;
+      exp -= 100;
     }
 
     updateStatus();
-    showQuestion();
+
+    document.getElementById("result").textContent =
+`スコア：${score}点
+
+講評：
+${result.comment}
+
+模範回答：
+${result.modelAnswer}`;
+
+  }
+  catch (error) {
+
+    document.getElementById("result").textContent =
+      "エラー：" + error.message;
+  }
+}
+
+function nextQuestion() {
+
+  currentQuestionIndex =
+    (currentQuestionIndex + 1) % questions.length;
+
+  showQuestion();
+}
+
+updateStatus();
+showQuestion();
+
+</script>
   </script>
 </body>
 </html>
