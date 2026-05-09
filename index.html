@@ -205,11 +205,14 @@ ${result.comment}
 ${result.modelAnswer}`;
 
   }
-  catch (error) {
+ catch (error) {
 
-    document.getElementById("result").textContent =
-      "エラー：" + error.message;
-  }
+  console.error(error);
+
+  document.getElementById("result").textContent =
+    "エラー詳細：\n" +
+    error.message +
+    "\n\nconsoleを確認してください";
 }
 
 function nextQuestion() {
