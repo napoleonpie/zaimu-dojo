@@ -92,8 +92,6 @@
   </div>
 
   <script>
-
-
 const questions = [
   {
     text: "銀行から『最近の資金繰り状況はいかがですか？』と聞かれました。30秒で回答してください。"
@@ -111,6 +109,7 @@ let exp = Number(localStorage.getItem("exp")) || 0;
 let level = Number(localStorage.getItem("level")) || 1;
 
 function updateStatus() {
+
   document.getElementById("exp").textContent = exp;
   document.getElementById("level").textContent = level;
 
@@ -119,6 +118,7 @@ function updateStatus() {
 }
 
 function showQuestion() {
+
   document.getElementById("question").textContent =
     questions[currentQuestionIndex].text;
 
@@ -205,14 +205,13 @@ ${result.comment}
 ${result.modelAnswer}`;
 
   }
- catch (error) {
+  catch (error) {
 
-  console.error(error);
+    console.error(error);
 
-  document.getElementById("result").textContent =
-    "エラー詳細：\n" +
-    error.message +
-    "\n\nconsoleを確認してください";
+    document.getElementById("result").textContent =
+      "エラー詳細：\n" + error.message;
+  }
 }
 
 function nextQuestion() {
