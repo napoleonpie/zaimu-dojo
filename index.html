@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: sans-serif;
-      background: #f4f6f8;
+      background: linear-gradient(135deg, #eef3ff, #f8fafc);
       margin: 0;
       padding: 20px;
       color: #222;
@@ -18,20 +18,20 @@
       max-width: 900px;
       margin: auto;
       background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     }
 
     .top {
       display: flex;
-      gap: 20px;
+      gap: 22px;
       align-items: center;
     }
 
     #trainerImage {
-      width: 220px;
-      border-radius: 16px;
+      width: 210px;
+      border-radius: 18px;
       background: #eee;
       object-fit: contain;
     }
@@ -41,22 +41,71 @@
     }
 
     .status h1 {
-      font-size: 36px;
-      margin: 0 0 18px;
+      font-size: 38px;
+      margin: 0 0 14px;
+    }
+
+    .status-card {
+      background: #f7f9ff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 10px;
     }
 
     .status p {
-      font-size: 18px;
-      margin: 8px 0;
+      font-size: 17px;
+      margin: 6px 0;
+    }
+
+    .exp-bar {
+      width: 100%;
+      height: 16px;
+      background: #ddd;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .exp-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #22c55e);
+      transition: width 0.4s;
+    }
+
+    .mode-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .basic {
+      background: #2563eb;
+    }
+
+    .advanced {
+      background: #c0392b;
     }
 
     .question {
       margin-top: 24px;
       padding: 16px;
       background: #eef3ff;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 17px;
       line-height: 1.7;
+    }
+
+    .hint-box {
+      background: #fff8dc;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 12px;
     }
 
     textarea {
@@ -66,25 +115,32 @@
       font-size: 16px;
       padding: 12px;
       box-sizing: border-box;
+      border-radius: 10px;
+      border: 1px solid #bbb;
     }
 
     button {
       margin-top: 16px;
       margin-right: 8px;
-      padding: 12px 24px;
+      padding: 13px 24px;
       font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #2563eb;
       color: white;
       cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.9;
     }
 
     .result {
       margin-top: 20px;
       padding: 18px;
       background: #f7f7f7;
-      border-radius: 12px;
+      border-radius: 14px;
       line-height: 1.7;
       font-size: 16px;
       white-space: normal;
@@ -123,12 +179,22 @@
       font-weight: bold;
     }
 
-    .hint-box {
-      background: #fff8dc;
-      padding: 10px;
+    .levelup {
+      background: #fff7ed;
+      border: 2px solid #f97316;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .teach-box {
+      background: #ecfdf5;
+      border-left: 5px solid #16a085;
+      padding: 12px;
       border-radius: 8px;
-      font-size: 14px;
-      margin-top: 12px;
+      margin-top: 10px;
+      font-weight: bold;
     }
 
     @media (max-width: 600px) {
@@ -158,7 +224,6 @@
 
       .status p {
         font-size: 15px;
-        margin: 5px 0;
       }
 
       .question {
@@ -168,7 +233,6 @@
 
       textarea {
         height: 120px;
-        font-size: 16px;
       }
 
       button {
@@ -181,14 +245,6 @@
         font-size: 15px;
         padding: 14px;
       }
-
-      .result h2 {
-        font-size: 22px;
-      }
-
-      .result h3 {
-        font-size: 17px;
-      }
     }
   </style>
 </head>
@@ -200,9 +256,15 @@
 
       <div class="status">
         <h1>財務道場</h1>
-        <p>レベル：<span id="level">1</span></p>
-        <p>経験値：<span id="exp">0</span> / 100</p>
-        <p>称号：<span id="title">見習い財務部員</span></p>
+
+        <div class="status-card">
+          <p>レベル：<span id="level">1</span></p>
+          <p>経験値：<span id="exp">0</span> / 100</p>
+          <div class="exp-bar">
+            <div class="exp-fill" id="expFill"></div>
+          </div>
+          <p>称号：<span id="title">見習い財務部員</span></p>
+        </div>
       </div>
     </div>
 
@@ -227,16 +289,27 @@
 
       document.getElementById("exp").textContent = exp;
       document.getElementById("level").textContent = level;
+      document.getElementById("expFill").style.width = exp + "%";
 
       let title = "見習い財務部員";
       if (level >= 3) title = "銀行対応担当";
       if (level >= 5) title = "資金繰りマスター";
       if (level >= 8) title = "財務参謀";
+      if (level >= 10) title = "CFO候補";
 
       document.getElementById("title").textContent = title;
 
       localStorage.setItem("exp", exp);
       localStorage.setItem("level", level);
+    }
+
+    function difficultyMultiplier(difficultyLevel) {
+      const lv = Number(difficultyLevel) || 3;
+      if (lv <= 1) return 1.0;
+      if (lv === 2) return 1.2;
+      if (lv === 3) return 1.4;
+      if (lv === 4) return 1.7;
+      return 2.0;
     }
 
     async function showQuestion() {
@@ -252,11 +325,15 @@
         );
 
         const data = await response.json();
-
         currentQuestion = data;
+
+        const modeClass = data.mode === "advanced" ? "advanced" : "basic";
+        const modeLabel = data.mode === "advanced" ? "応用問題" : "基礎問題";
 
         document.getElementById("question").innerHTML =
           `
+          <span class="mode-badge ${modeClass}">${modeLabel}</span>
+
           <div style="margin-bottom:10px;">
             <strong>カテゴリ：</strong>${data.category}
             &nbsp;&nbsp;
@@ -273,7 +350,6 @@
           `;
 
         document.getElementById("answer").value = "";
-
         document.getElementById("result").textContent =
           "回答すると、ここに採点結果が表示されます。";
 
@@ -292,8 +368,6 @@
         return;
       }
 
-      const question = currentQuestion.question;
-
       if (answer.trim() === "") {
         document.getElementById("result").textContent =
           "まずは回答を書いてください。";
@@ -308,11 +382,9 @@
           "https://zaimu-dojo.vercel.app/api/grade",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              question: question,
+              question: currentQuestion.question,
               answer: answer
             })
           }
@@ -324,10 +396,9 @@
           throw new Error(result.error || "採点に失敗しました");
         }
 
-        const score = Number(result.score);
+        const score = Number(result.score) || 0;
 
         let image = "img/trainer_normal.png";
-
         if (score >= 90) {
           image = "img/trainer_great.png";
         } else if (score >= 75) {
@@ -337,29 +408,27 @@
         } else {
           image = "img/trainer_bad.png";
         }
-
         document.getElementById("trainerImage").src = image;
 
-        exp += Math.round(score / 5);
+        const multiplier = difficultyMultiplier(currentQuestion.difficultyLevel);
+        const gainedExp = Math.round((score / 5) * multiplier);
 
-        if (exp >= 100) {
+        exp += gainedExp;
+
+        let levelUpMessage = "";
+
+        while (exp >= 100) {
           level++;
           exp -= 100;
+          levelUpMessage = `<div class="levelup">🎉 レベルアップ！ レベル${level}になりました！</div>`;
         }
 
         updateStatus();
 
-        const goodPoints = Array.isArray(result.goodPoints)
-          ? result.goodPoints
-          : [];
+        const goodPoints = Array.isArray(result.goodPoints) ? result.goodPoints : [];
+        const improvements = Array.isArray(result.improvements) ? result.improvements : [];
 
-        const improvements = Array.isArray(result.improvements)
-          ? result.improvements
-          : [];
-
-        const goodPointsHtml = goodPoints.map(item => `
-          <li>${item}</li>
-        `).join("");
+        const goodPointsHtml = goodPoints.map(item => `<li>${item}</li>`).join("");
 
         const improvementsHtml = improvements.map(item => `
           <li>
@@ -369,7 +438,12 @@
         `).join("");
 
         document.getElementById("result").innerHTML = `
+          ${levelUpMessage}
+
           <h2>スコア：${score}点 / 100点</h2>
+          <p><strong>獲得EXP：</strong>${gainedExp} EXP</p>
+          <p><strong>問題タイプ：</strong>${currentQuestion.mode === "advanced" ? "応用問題" : "基礎問題"}</p>
+          <p><strong>難易度倍率：</strong>${multiplier}倍</p>
 
           <h3>■ TAKAさんの回答要約</h3>
           <p>${result.summary || ""}</p>
@@ -388,11 +462,13 @@
 
           <h3>■ トレーナーからの一言</h3>
           <p>${result.trainerComment || ""}</p>
+
+          <div class="teach-box">
+            📘 今日の教え：${result.trainer_teach || ""}
+          </div>
         `;
 
       } catch (error) {
-        console.error(error);
-
         document.getElementById("result").textContent =
           "エラー詳細：\n" + error.message;
       }
