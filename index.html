@@ -246,6 +246,29 @@
         padding: 14px;
       }
     }
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.category-buttons button {
+  background: #334155;
+  padding: 9px 14px;
+  font-size: 14px;
+  margin: 0;
+}
+
+.category-buttons button:hover {
+  background: #0f172a;
+}
+
+.title-flavor {
+  color: #7c3aed;
+  font-weight: bold;
+}
+  
   </style>
 </head>
 
@@ -270,7 +293,15 @@
 
     <div class="question" id="question">AIが問題を生成中です...</div>
 
-    <textarea id="answer" placeholder="ここに回答を入力してください"></textarea>
+<div class="category-buttons">
+  <button onclick="nextQuestion('random')">ランダム</button>
+  <button onclick="nextQuestion('basic')">基礎</button>
+  <button onclick="nextQuestion('advanced')">応用</button>
+  <button onclick="nextQuestion('performance_debt')">業績・借入状況</button>
+  <button onclick="nextQuestion('rates_macro')">金利・経済</button>
+</div>
+
+<textarea id="answer" placeholder="ここに回答を入力してください"></textarea>
 
     <button onclick="gradeAnswer()">採点する</button>
     <button onclick="nextQuestion()">次の問題</button>
@@ -291,11 +322,58 @@
       document.getElementById("level").textContent = level;
       document.getElementById("expFill").style.width = exp + "%";
 
-      let title = "見習い財務部員";
-      if (level >= 3) title = "銀行対応担当";
-      if (level >= 5) title = "資金繰りマスター";
-      if (level >= 8) title = "財務参謀";
-      if (level >= 10) title = "CFO候補";
+      const titles = [
+  { level: 1, name: "見習い財務部員｜電卓を握りし者" },
+  { level: 2, name: "銀行面談ビギナー｜沈黙を恐れぬ者" },
+  { level: 3, name: "借入残高メモ職人｜数字を探す旅人" },
+  { level: 4, name: "資金繰り見張り番｜支払日を忘れない者" },
+  { level: 5, name: "TIBORの入口に立つ者" },
+  { level: 6, name: "短プラの気配を感じる者" },
+  { level: 7, name: "銀行員の本音翻訳係" },
+  { level: 8, name: "コベナンツ見習い監視人" },
+  { level: 9, name: "営業CFを信じる者" },
+  { level: 10, name: "金利交渉の小太刀使い" },
+  { level: 11, name: "自己資本比率を気にし始めた男" },
+  { level: 12, name: "EBITDA倍率の門番" },
+  { level: 13, name: "メインバンク懐柔士" },
+  { level: 14, name: "資金ショート予防士" },
+  { level: 15, name: "銀行面談の場数王" },
+  { level: 16, name: "財務制限条項ウォッチャー" },
+  { level: 17, name: "変動金利に怯えぬ者" },
+  { level: 18, name: "固定金利との距離感を知る者" },
+  { level: 19, name: "試算表を読む夜の番人" },
+  { level: 20, name: "CFO候補｜まだ名刺は普通" },
+  { level: 25, name: "銀行員を少し安心させる者" },
+  { level: 30, name: "財務参謀｜Excelと対話する者" },
+  { level: 40, name: "資金繰り仙人｜月末を越えし者" },
+  { level: 50, name: "CFO前夜｜銀行団がざわつく存在" }
+];
+
+let title = titles[0].name;
+
+for (const t of titles) {
+  if (level >= t.level) {
+    title = t.name;
+  }
+}
+
+const bonusTitles = [
+  "本日の肩書き：支払予定表の守護者",
+  "本日の肩書き：銀行員の眉間を読む者",
+  "本日の肩書き：金利上昇局面のサバイバー",
+  "本日の肩書き：BSの森を歩く者",
+  "本日の肩書き：PLとCFの通訳者",
+  "本日の肩書き：借入一覧の整理整頓係長",
+  "本日の肩書き：数字で語る練習生",
+  "本日の肩書き：自己資本比率をそっと見守る者",
+  "本日の肩書き：担保余力の観察者",
+  "本日の肩書き：銀行面談で汗をかきながら成長する男"
+];
+
+const todayIndex = new Date().getDate() % bonusTitles.length;
+
+document.getElementById("title").innerHTML =
+  `${title}<br><span class="title-flavor">${bonusTitles[todayIndex]}</span>`;
 
       document.getElementById("title").textContent = title;
 
@@ -312,53 +390,60 @@
       return 2.0;
     }
 
-    async function showQuestion() {
-      document.getElementById("question").textContent =
-        "AIが問題を生成中です...";
+    async function showQuestion(type = "random") {
+  document.getElementById("question").textContent =
+    "AIが問題を生成中です...";
 
-      document.getElementById("trainerImage").src =
-        "img/trainer_normal.png";
+  document.getElementById("trainerImage").src =
+    "img/trainer_normal.png";
 
-      try {
-        const response = await fetch(
-          "https://zaimu-dojo.vercel.app/api/question"
-        );
+  try {
+    const response = await fetch(
+      `https://zaimu-dojo.vercel.app/api/question?type=${type}`
+    );
 
-        const data = await response.json();
-        currentQuestion = data;
+    const data = await response.json();
+    currentQuestion = data;
 
-        const modeClass = data.mode === "advanced" ? "advanced" : "basic";
-        const modeLabel = data.mode === "advanced" ? "応用問題" : "基礎問題";
+    const modeLabels = {
+      basic: "基礎問題",
+      advanced: "応用問題",
+      performance_debt: "業績・借入状況",
+      rates_macro: "金利・経済",
+      random: "ランダム"
+    };
 
-        document.getElementById("question").innerHTML =
-          `
-          <span class="mode-badge ${modeClass}">${modeLabel}</span>
+    const modeLabel = modeLabels[data.mode] || modeLabels[type] || "ランダム";
+    const modeClass = data.mode === "advanced" ? "advanced" : "basic";
 
-          <div style="margin-bottom:10px;">
-            <strong>カテゴリ：</strong>${data.category}
-            &nbsp;&nbsp;
-            <strong>難易度：</strong>${data.difficulty}
-          </div>
+    document.getElementById("question").innerHTML =
+      `
+      <span class="mode-badge ${modeClass}">${modeLabel}</span>
 
-          <div style="font-size:18px; margin-bottom:12px;">
-            ${data.question}
-          </div>
+      <div style="margin-bottom:10px;">
+        <strong>カテゴリ：</strong>${data.category}
+        &nbsp;&nbsp;
+        <strong>難易度：</strong>${data.difficulty}
+      </div>
 
-          <div class="hint-box">
-            💡 ヒント：${data.hint}
-          </div>
-          `;
+      <div style="font-size:18px; margin-bottom:12px;">
+        ${data.question}
+      </div>
 
-        document.getElementById("answer").value = "";
-        document.getElementById("result").textContent =
-          "回答すると、ここに採点結果が表示されます。";
+      <div class="hint-box">
+        💡 ヒント：${data.hint}
+      </div>
+      `;
 
-      } catch (error) {
-        document.getElementById("question").textContent =
-          "問題生成エラー：" + error.message;
-      }
-    }
+    document.getElementById("answer").value = "";
+    document.getElementById("result").textContent =
+      "回答すると、ここに採点結果が表示されます。";
 
+  } catch (error) {
+    document.getElementById("question").textContent =
+      "問題生成エラー：" + error.message;
+  }
+}
     async function gradeAnswer() {
       const answer = document.getElementById("answer").value;
 
@@ -474,9 +559,9 @@
       }
     }
 
-    function nextQuestion() {
-      showQuestion();
-    }
+    function nextQuestion(type = "random") {
+  showQuestion(type);
+}
 
     updateStatus();
     showQuestion();
