@@ -224,14 +224,38 @@ async function gradeAnswer() {
 
     updateStatus();
 
-    document.getElementById("result").textContent =
-`スコア：${score}点
+    const improvementsHtml = result.improvements.map(item => `
+  <li>
+    <strong>不足点：</strong>${item.point}<br>
+    <span class="red-example">（例）${item.example}</span>
+  </li>
+`).join("");
 
-講評：
-${result.comment}
+const goodPointsHtml = result.goodPoints.map(item => `
+  <li>${item}</li>
+`).join("");
 
-模範回答：
-${result.modelAnswer}`;
+document.getElementById("result").innerHTML = `
+  <h2>スコア：${score}点 / 100点</h2>
+
+  <h3>■ TAKAさんの回答要約</h3>
+  <p>${result.summary}</p>
+
+  <h3>■ 良かった点</h3>
+  <ul>${goodPointsHtml}</ul>
+
+  <h3>■ 改善点</h3>
+  <ul>${improvementsHtml}</ul>
+
+  <h3>■ 銀行員の本音</h3>
+  <p>「${result.bankerIntent}」</p>
+
+  <h3>■ 模範回答</h3>
+  <p>${result.modelAnswer}</p>
+
+  <h3>■ トレーナーからの一言</h3>
+  <p>${result.trainerComment}</p>
+`;
 
   }
   catch (error) {
