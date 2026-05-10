@@ -4,13 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>財務道場 AIトレーナー</title>
+
   <style>
     body {
       font-family: sans-serif;
       background: #f4f6f8;
       margin: 0;
       padding: 20px;
+      color: #222;
     }
+
     .dojo {
       max-width: 900px;
       margin: auto;
@@ -19,27 +22,43 @@
       padding: 20px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
+
     .top {
       display: flex;
       gap: 20px;
       align-items: center;
     }
-    img {
+
+    #trainerImage {
       width: 220px;
       border-radius: 16px;
       background: #eee;
+      object-fit: contain;
     }
+
     .status {
       flex: 1;
     }
+
+    .status h1 {
+      font-size: 36px;
+      margin: 0 0 18px;
+    }
+
+    .status p {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
     .question {
       margin-top: 24px;
       padding: 16px;
       background: #eef3ff;
       border-radius: 12px;
-      font-size: 18px;
-      line-height: 1.6;
+      font-size: 17px;
+      line-height: 1.7;
     }
+
     textarea {
       width: 100%;
       height: 140px;
@@ -48,8 +67,10 @@
       padding: 12px;
       box-sizing: border-box;
     }
+
     button {
       margin-top: 16px;
+      margin-right: 8px;
       padding: 12px 24px;
       font-size: 16px;
       border: none;
@@ -58,87 +79,125 @@
       color: white;
       cursor: pointer;
     }
+
     .result {
       margin-top: 20px;
-      padding: 16px;
+      padding: 18px;
       background: #f7f7f7;
       border-radius: 12px;
       line-height: 1.7;
-      white-space: pre-wrap;
+      font-size: 16px;
+      white-space: normal;
     }
-    .result {
-  margin-top: 20px;
-}
 
-.red-example {
-  color: #c0392b;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
-  font-weight: bold;
-}
+    .result h2 {
+      margin: 0 0 16px;
+      font-size: 24px;
+    }
 
-@media (max-width: 600px) {
-  body {
-    padding: 10px;
-  }
+    .result h3 {
+      margin: 22px 0 8px;
+      font-size: 18px;
+    }
 
-  .dojo {
-    padding: 14px;
-  }
+    .result p {
+      margin: 8px 0;
+      line-height: 1.7;
+    }
 
-  .top {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
+    .result ul {
+      margin: 8px 0 12px 22px;
+      padding: 0;
+    }
 
-  .status {
-    width: 100%;
-  }
+    .result li {
+      margin-bottom: 10px;
+      line-height: 1.7;
+    }
 
-  .status h1 {
-    font-size: 28px;
-    margin: 8px 0 12px;
-  }
+    .red-example {
+      color: #c0392b;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      font-weight: bold;
+    }
 
-  img#trainerImage {
-    width: 140px;
-    max-height: 220px;
-    object-fit: contain;
-  }
+    .hint-box {
+      background: #fff8dc;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 12px;
+    }
 
-  .status p {
-    font-size: 16px;
-    margin: 6px 0;
-  }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
 
-  .question {
-    font-size: 16px;
-    padding: 14px;
-  }
+      .dojo {
+        padding: 14px;
+      }
 
-  textarea {
-    height: 120px;
-    font-size: 16px;
-  }
+      .top {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
 
-  button {
-    width: 100%;
-    margin-top: 10px;
-  }
+      #trainerImage {
+        width: 130px;
+        max-height: 190px;
+      }
 
-  .result {
-    font-size: 15px;
-  }
-}
+      .status h1 {
+        font-size: 30px;
+        margin: 8px 0 12px;
+      }
+
+      .status p {
+        font-size: 15px;
+        margin: 5px 0;
+      }
+
+      .question {
+        font-size: 15px;
+        padding: 14px;
+      }
+
+      textarea {
+        height: 120px;
+        font-size: 16px;
+      }
+
+      button {
+        width: 100%;
+        margin-right: 0;
+        margin-top: 10px;
+      }
+
+      .result {
+        font-size: 15px;
+        padding: 14px;
+      }
+
+      .result h2 {
+        font-size: 22px;
+      }
+
+      .result h3 {
+        font-size: 17px;
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="dojo">
     <div class="top">
-      <img id="trainerImage" src="img/trainer_normal.png">
+      <img id="trainerImage" src="img/trainer_normal.png" alt="トレーナー画像">
+
       <div class="status">
         <h1>財務道場</h1>
         <p>レベル：<span id="level">1</span></p>
@@ -147,7 +206,7 @@
       </div>
     </div>
 
-    <div class="question" id="question"></div>
+    <div class="question" id="question">AIが問題を生成中です...</div>
 
     <textarea id="answer" placeholder="ここに回答を入力してください"></textarea>
 
@@ -158,183 +217,193 @@
   </div>
 
   <script>
-let currentQuestion = null;
+    let currentQuestion = null;
+    let exp = Number(localStorage.getItem("exp")) || 0;
+    let level = Number(localStorage.getItem("level")) || 1;
 
-let currentQuestionIndex = 0;
-let exp = Number(localStorage.getItem("exp")) || 0;
-let level = Number(localStorage.getItem("level")) || 1;
+    function updateStatus() {
+      if (isNaN(exp)) exp = 0;
+      if (isNaN(level)) level = 1;
 
-function updateStatus() {
+      document.getElementById("exp").textContent = exp;
+      document.getElementById("level").textContent = level;
 
-  document.getElementById("exp").textContent = exp;
-  document.getElementById("level").textContent = level;
+      let title = "見習い財務部員";
+      if (level >= 3) title = "銀行対応担当";
+      if (level >= 5) title = "資金繰りマスター";
+      if (level >= 8) title = "財務参謀";
 
-  localStorage.setItem("exp", exp);
-  localStorage.setItem("level", level);
-}
+      document.getElementById("title").textContent = title;
 
-async function showQuestion() {
+      localStorage.setItem("exp", exp);
+      localStorage.setItem("level", level);
+    }
 
-  document.getElementById("question").textContent =
-    "AIが問題を生成中です...";
+    async function showQuestion() {
+      document.getElementById("question").textContent =
+        "AIが問題を生成中です...";
 
-  try {
+      document.getElementById("trainerImage").src =
+        "img/trainer_normal.png";
 
-    const response = await fetch(
-      "https://zaimu-dojo.vercel.app/api/question"
-    );
+      try {
+        const response = await fetch(
+          "https://zaimu-dojo.vercel.app/api/question"
+        );
 
-    const data = await response.json();
+        const data = await response.json();
 
-    currentQuestion = data;
+        currentQuestion = data;
 
-    document.getElementById("question").innerHTML =
-      `
-      <div style="margin-bottom:10px;">
-        <strong>カテゴリ：</strong>${data.category}
-        &nbsp;&nbsp;
-        <strong>難易度：</strong>${data.difficulty}
-      </div>
+        document.getElementById("question").innerHTML =
+          `
+          <div style="margin-bottom:10px;">
+            <strong>カテゴリ：</strong>${data.category}
+            &nbsp;&nbsp;
+            <strong>難易度：</strong>${data.difficulty}
+          </div>
 
-      <div style="font-size:20px; margin-bottom:12px;">
-        ${data.question}
-      </div>
+          <div style="font-size:18px; margin-bottom:12px;">
+            ${data.question}
+          </div>
 
-      <div style="
-        background:#fff8dc;
-        padding:10px;
-        border-radius:8px;
-        font-size:14px;
-      ">
-        💡 ヒント：${data.hint}
-      </div>
-      `;
+          <div class="hint-box">
+            💡 ヒント：${data.hint}
+          </div>
+          `;
 
-    document.getElementById("answer").value = "";
+        document.getElementById("answer").value = "";
 
-    document.getElementById("result").textContent =
-      "回答すると、ここに採点結果が表示されます。";
+        document.getElementById("result").textContent =
+          "回答すると、ここに採点結果が表示されます。";
 
-  }
-  catch (error) {
-
-    document.getElementById("question").textContent =
-      "問題生成エラー：" + error.message;
-  }
-}
-
-async function gradeAnswer() {
-
-  const answer =
-    document.getElementById("answer").value;
-
-  const question =
-  currentQuestion.question;
-
-  if (answer.trim() === "") {
-
-    document.getElementById("result").textContent =
-      "まずは回答を書いてください。";
-
-    return;
-  }
-
-  document.getElementById("result").textContent =
-    "AIトレーナーが採点中です...";
-
-  try {
-
-    const response = await fetch(
-      "https://zaimu-dojo.vercel.app/api/grade",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          question: question,
-          answer: answer
-        })
+      } catch (error) {
+        document.getElementById("question").textContent =
+          "問題生成エラー：" + error.message;
       }
-    );
+    }
 
-    const result = await response.json();
+    async function gradeAnswer() {
+      const answer = document.getElementById("answer").value;
 
-    const score = result.score;
+      if (!currentQuestion) {
+        document.getElementById("result").textContent =
+          "まだ問題が生成されていません。少し待ってください。";
+        return;
+      }
 
-    let image = "img/trainer_normal.png";
+      const question = currentQuestion.question;
 
-if (score >= 90) {
-  image = "img/trainer_great.png";
-} else if (score >= 75) {
-  image = "img/trainer_good.png";
-} else if (score >= 55) {
-  image = "img/trainer_soso.png";
-} else {
-  image = "img/trainer_bad.png";
-}
+      if (answer.trim() === "") {
+        document.getElementById("result").textContent =
+          "まずは回答を書いてください。";
+        return;
+      }
 
-document.getElementById("trainerImage").src = image;
-    exp += Math.round(score / 5);
+      document.getElementById("result").textContent =
+        "AIトレーナーが採点中です...";
 
-    if (exp >= 100) {
-      level++;
-      exp -= 100;
+      try {
+        const response = await fetch(
+          "https://zaimu-dojo.vercel.app/api/grade",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              question: question,
+              answer: answer
+            })
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "採点に失敗しました");
+        }
+
+        const score = Number(result.score);
+
+        let image = "img/trainer_normal.png";
+
+        if (score >= 90) {
+          image = "img/trainer_great.png";
+        } else if (score >= 75) {
+          image = "img/trainer_good.png";
+        } else if (score >= 55) {
+          image = "img/trainer_soso.png";
+        } else {
+          image = "img/trainer_bad.png";
+        }
+
+        document.getElementById("trainerImage").src = image;
+
+        exp += Math.round(score / 5);
+
+        if (exp >= 100) {
+          level++;
+          exp -= 100;
+        }
+
+        updateStatus();
+
+        const goodPoints = Array.isArray(result.goodPoints)
+          ? result.goodPoints
+          : [];
+
+        const improvements = Array.isArray(result.improvements)
+          ? result.improvements
+          : [];
+
+        const goodPointsHtml = goodPoints.map(item => `
+          <li>${item}</li>
+        `).join("");
+
+        const improvementsHtml = improvements.map(item => `
+          <li>
+            <strong>不足点：</strong>${item.point}<br>
+            <span class="red-example">（例）${item.example}</span>
+          </li>
+        `).join("");
+
+        document.getElementById("result").innerHTML = `
+          <h2>スコア：${score}点 / 100点</h2>
+
+          <h3>■ TAKAさんの回答要約</h3>
+          <p>${result.summary || ""}</p>
+
+          <h3>■ 良かった点</h3>
+          <ul>${goodPointsHtml}</ul>
+
+          <h3>■ 改善点</h3>
+          <ul>${improvementsHtml}</ul>
+
+          <h3>■ 銀行員の本音</h3>
+          <p>「${result.bankerIntent || ""}」</p>
+
+          <h3>■ 模範回答</h3>
+          <p>${result.modelAnswer || ""}</p>
+
+          <h3>■ トレーナーからの一言</h3>
+          <p>${result.trainerComment || ""}</p>
+        `;
+
+      } catch (error) {
+        console.error(error);
+
+        document.getElementById("result").textContent =
+          "エラー詳細：\n" + error.message;
+      }
+    }
+
+    function nextQuestion() {
+      showQuestion();
     }
 
     updateStatus();
-
-    const improvementsHtml = result.improvements.map(item => `
-  <li>
-    <strong>不足点：</strong>${item.point}<br>
-    <span class="red-example">（例）${item.example}</span>
-  </li>
-`).join("");
-
-const goodPointsHtml = result.goodPoints.map(item => `
-  <li>${item}</li>
-`).join("");
-
-document.getElementById("result").innerHTML = `
-  <h2>スコア：${score}点 / 100点</h2>
-
-  <h3>■ TAKAさんの回答要約</h3>
-  <p>${result.summary}</p>
-
-  <h3>■ 良かった点</h3>
-  <ul>${goodPointsHtml}</ul>
-
-  <h3>■ 改善点</h3>
-  <ul>${improvementsHtml}</ul>
-
-  <h3>■ 銀行員の本音</h3>
-  <p>「${result.bankerIntent}」</p>
-
-  <h3>■ 模範回答</h3>
-  <p>${result.modelAnswer}</p>
-
-  <h3>■ トレーナーからの一言</h3>
-  <p>${result.trainerComment}</p>
-`;
-
-  }
-  catch (error) {
-
-    console.error(error);
-
-    document.getElementById("result").textContent =
-      "エラー詳細：\n" + error.message;
-  }
-}
-
-function nextQuestion() {
-  showQuestion();
-}
-
-updateStatus();
-showQuestion();
+    showQuestion();
   </script>
 </body>
 </html>
