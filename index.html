@@ -15,22 +15,23 @@
     }
 
     .dojo {
-      max-width: 900px;
+      max-width: 980px;
       margin: auto;
       background: white;
       border-radius: 20px;
-      padding: 22px;
+      padding: 26px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     }
 
     .top {
       display: flex;
-      gap: 22px;
+      gap: 40px;
       align-items: center;
     }
 
     #trainerImage {
-      width: 210px;
+      width: 320px;
+      max-height: 480px;
       border-radius: 18px;
       background: #eee;
       object-fit: contain;
@@ -40,21 +41,27 @@
       flex: 1;
     }
 
-    .status h1 {
-      font-size: 38px;
-      margin: 0 0 14px;
+    .logo-area {
+      margin-bottom: 10px;
+    }
+
+    .logo-image {
+      width: 100%;
+      max-width: 340px;
+      display: block;
     }
 
     .status-card {
       background: #f7f9ff;
       border-radius: 14px;
-      padding: 12px 14px;
-      margin-top: 10px;
+      padding: 18px 20px;
+      margin-top: 6px;
+      max-width: 560px;
     }
 
     .status p {
-      font-size: 17px;
-      margin: 6px 0;
+      font-size: 18px;
+      margin: 8px 0;
     }
 
     .exp-bar {
@@ -90,6 +97,7 @@
     }
 
     .basic { background: #2563eb; }
+    .company_info { background: #7c3aed; }
     .advanced { background: #c0392b; }
     .performance_debt { background: #e67e22; }
     .rates_macro { background: #16a085; }
@@ -220,35 +228,29 @@
     }
 
     @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
 
-  body {
-    padding: 10px;
-  }
+      .dojo {
+        padding: 14px;
+      }
 
-  .dojo {
-    padding: 14px;
-  }
+      .top {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
+      }
 
-  .logo-image {
-    max-width: 320px;
-    margin: 0 auto;
-  }
-
-  .top {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-}
       #trainerImage {
         width: 130px;
         max-height: 190px;
       }
 
-      .status h1 {
-        font-size: 30px;
-        margin: 8px 0 12px;
+      .logo-image {
+        max-width: 320px;
+        margin: 0 auto;
       }
 
       .status p {
@@ -279,49 +281,6 @@
         padding: 14px;
       }
     }
-.logo-area {
-  margin-bottom: 20px;
-}
-
-.logo-image {
-  width: 100%;
-  max-width: 600px;
-  display: block;
-}
-/* ロゴ */
-.logo-area {
-  margin-bottom: 20px;
-}
-
-.logo-image {
-  width: 100%;
-  max-width: 600px;
-  display: block;
-}
-
-/* スマホ用 */
-@media (max-width: 600px) {
-
-  body {
-    padding: 10px;
-  }
-
-  .dojo {
-    padding: 14px;
-  }
-
-  .logo-image {
-    max-width: 320px;
-    margin: 0 auto;
-  }
-
-  .top {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-}
   </style>
 </head>
 
@@ -332,8 +291,8 @@
 
       <div class="status">
         <div class="logo-area">
-  <img src="img/zaimudoujyo.png" class="logo-image">
-</div>
+          <img src="img/zaimudoujyo.png" class="logo-image" alt="財務道場ロゴ">
+        </div>
 
         <div class="status-card">
           <p>レベル：<span id="level">1</span></p>
@@ -349,13 +308,13 @@
     <div class="question" id="question">AIが問題を生成中です...</div>
 
     <div class="category-buttons">
-  <button onclick="nextQuestion('random')">ランダム</button>
-  <button onclick="nextQuestion('basic')">基礎</button>
-  <button onclick="nextQuestion('company_info')">会社の状況</button>
-  <button onclick="nextQuestion('advanced')">応用</button>
-  <button onclick="nextQuestion('performance_debt')">業績・借入状況</button>
-  <button onclick="nextQuestion('rates_macro')">金利・経済</button>
-</div>
+      <button onclick="nextQuestion('random')">ランダム</button>
+      <button onclick="nextQuestion('basic')">基礎</button>
+      <button onclick="nextQuestion('company_info')">会社の状況</button>
+      <button onclick="nextQuestion('advanced')">応用</button>
+      <button onclick="nextQuestion('performance_debt')">業績・借入状況</button>
+      <button onclick="nextQuestion('rates_macro')">金利・経済</button>
+    </div>
 
     <textarea id="answer" placeholder="ここに回答を入力してください"></textarea>
 
@@ -456,14 +415,14 @@
 
         currentQuestion = data;
 
-       const modeLabels = {
-  basic: "基礎",
-  company_info: "会社の状況",
-  advanced: "応用",
-  performance_debt: "業績・借入状況",
-  rates_macro: "金利・経済",
-  random: "ランダム"
-};
+        const modeLabels = {
+          basic: "基礎",
+          company_info: "会社の状況",
+          advanced: "応用",
+          performance_debt: "業績・借入状況",
+          rates_macro: "金利・経済",
+          random: "ランダム"
+        };
 
         const mode = data.mode || type;
         const modeLabel = modeLabels[mode] || modeLabels[type] || "ランダム";
