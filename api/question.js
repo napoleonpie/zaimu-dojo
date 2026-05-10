@@ -3,20 +3,25 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "GET only" });
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
 
   try {
-    const prompt = `
-あなたは超一流の「銀行面談トレーナーAI」です。
+    const mode = Math.random() < 0.5 ? "basic" : "advanced";
 
-目的：
-TAKAさんを、銀行対応・借入交渉・資金繰り説明・経済説明に強い財務部員へ育てること。
+    const prompt = `
+あなたはTAKAさん専属の財務部員育成AIトレーナーです。
+
+今回の出題モード：
+${mode === "basic" ? "基礎問題" : "応用問題"}
+
+基礎問題の場合：
+- 業績、BS、借入残高、金利条件、事業内容、投資計画、経済指標などをシンプルに聞く
+- 30秒で回答できる銀行面談の基礎確認にする
+
+応用問題の場合：
+- 業績、BS、借入、金利、投資計画、経済状況、銀行員の本音を複数組み合わせる
+- 実際の銀行面談で深掘りされそうな質問にする
 
 TAKAさんの会社情報：
 - 有機溶剤リサイクル業
@@ -26,24 +31,16 @@ TAKAさんの会社情報：
 - 新規事業あり
 - 金利上昇局面を意識する必要がある
 
-問題作成ルール：
-- 実際の銀行員が聞きそうな質問にする
-- 単なる知識問題ではなく、説明力を鍛える問題にする
-- 資金繰り、借入、業績説明、金利、自己資本、設備投資、業界動向、5Cを扱う
-- 銀行員の本音も含める
-- ヒントも出す
-- 毎回できるだけ違う問題にする
-- 日本語で出す
-
-出力は必ずJSONだけにしてください。
-Markdownや説明文は不要です。
+出力は必ずJSONだけ。
 
 {
-  "category": "資金繰り",
-  "difficulty": "★★★☆☆",
-  "question": "銀行から『最近の資金繰り状況はいかがですか？』と聞かれました。財務担当者として30秒で回答してください。",
-  "bankerIntent": "銀行は、短期的な支払い能力と、資金ショートのリスクがないかを確認したい。",
-  "hint": "現預金残高、今後の大口支払い、借入余力、営業キャッシュフローに触れると良いです。"
+  "mode": "basic または advanced",
+  "category": "資金繰り・借入・業績・BS・事業内容・投資計画・経済動向など",
+  "difficulty": "★☆☆☆☆〜★★★★★",
+  "difficultyLevel": 1,
+  "question": "銀行員からの質問文",
+  "bankerIntent": "銀行員の本音",
+  "hint": "回答のヒント"
 }
 `;
 
@@ -62,38 +59,20 @@ Markdownや説明文は不要です。
     const data = await openaiRes.json();
 
     if (!openaiRes.ok) {
-      return res.status(500).json({
-        error: "OpenAI API error",
-        detail: data
-      });
+      return res.status(500).json({ error: "OpenAI API error", detail: data });
     }
 
-    const text =
-      data.output?.[0]?.content?.[0]?.text ||
-      data.output_text;
-
-    if (!text) {
-      return res.status(500).json({
-        error: "AI response empty",
-        raw: data
-      });
-    }
+    const text = data.output?.[0]?.content?.[0]?.text || data.output_text;
 
     const cleaned = text
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    let result;
+    const result = JSON.parse(cleaned);
 
-    try {
-      result = JSON.parse(cleaned);
-    } catch (e) {
-      return res.status(500).json({
-        error: "JSON parse failed",
-        raw: cleaned
-      });
-    }
+    result.mode = result.mode || mode;
+    result.difficultyLevel = Number(result.difficultyLevel) || 3;
 
     return res.status(200).json(result);
 
