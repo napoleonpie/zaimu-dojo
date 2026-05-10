@@ -56,6 +56,8 @@ TAKAさんの会社：
 - 難易度を設定する
 - JSONのみ返す
 - Markdownは禁止
+- コードブロックは禁止
+- 前置き文章は禁止
 
 必ずこのJSON形式だけで返してください。
 
@@ -78,7 +80,7 @@ TAKAさんの会社：
       body: JSON.stringify({
         model: "gpt-4.1-mini",
         input: prompt,
-        temperature: 0.9
+        temperature: 0.7
       })
     });
 
@@ -96,10 +98,18 @@ TAKAさんの会社：
       data.output_text ||
       "";
 
-    const cleaned = text
+    let cleaned = text
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
+
+    // 文章が混ざった場合でも、最初の { から最後の } だけを取り出す
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    }
 
     let result;
 
@@ -108,7 +118,8 @@ TAKAさんの会社：
     } catch (e) {
       return res.status(500).json({
         error: "JSON parse failed",
-        raw: cleaned
+        raw: cleaned,
+        original: text
       });
     }
 
