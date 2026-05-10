@@ -399,13 +399,14 @@
 
         currentQuestion = data;
 
-        const modeLabels = {
-          basic: "基礎",
-          advanced: "応用",
-          performance_debt: "業績・借入状況",
-          rates_macro: "金利・経済",
-          random: "ランダム"
-        };
+       const modeLabels = {
+  basic: "基礎",
+  company_info: "会社の状況",
+  advanced: "応用",
+  performance_debt: "業績・借入状況",
+  rates_macro: "金利・経済",
+  random: "ランダム"
+};
 
         const mode = data.mode || type;
         const modeLabel = modeLabels[mode] || modeLabels[type] || "ランダム";
