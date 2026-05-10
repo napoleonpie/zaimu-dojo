@@ -73,6 +73,12 @@
       transition: width 0.4s;
     }
 
+    .title-flavor {
+      color: #7c3aed;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
     .mode-badge {
       display: inline-block;
       padding: 5px 10px;
@@ -83,13 +89,11 @@
       margin-bottom: 8px;
     }
 
-    .basic {
-      background: #2563eb;
-    }
-
-    .advanced {
-      background: #c0392b;
-    }
+    .basic { background: #2563eb; }
+    .advanced { background: #c0392b; }
+    .performance_debt { background: #e67e22; }
+    .rates_macro { background: #16a085; }
+    .random { background: #334155; }
 
     .question {
       margin-top: 24px;
@@ -98,6 +102,24 @@
       border-radius: 14px;
       font-size: 17px;
       line-height: 1.7;
+    }
+
+    .category-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .category-buttons button {
+      background: #334155;
+      padding: 9px 14px;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .category-buttons button:hover {
+      background: #0f172a;
     }
 
     .hint-box {
@@ -198,13 +220,8 @@
     }
 
     @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-
-      .dojo {
-        padding: 14px;
-      }
+      body { padding: 10px; }
+      .dojo { padding: 14px; }
 
       .top {
         flex-direction: column;
@@ -241,34 +258,15 @@
         margin-top: 10px;
       }
 
+      .category-buttons button {
+        width: 100%;
+      }
+
       .result {
         font-size: 15px;
         padding: 14px;
       }
     }
-.category-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.category-buttons button {
-  background: #334155;
-  padding: 9px 14px;
-  font-size: 14px;
-  margin: 0;
-}
-
-.category-buttons button:hover {
-  background: #0f172a;
-}
-
-.title-flavor {
-  color: #7c3aed;
-  font-weight: bold;
-}
-  
   </style>
 </head>
 
@@ -293,18 +291,18 @@
 
     <div class="question" id="question">AIが問題を生成中です...</div>
 
-<div class="category-buttons">
-  <button onclick="nextQuestion('random')">ランダム</button>
-  <button onclick="nextQuestion('basic')">基礎</button>
-  <button onclick="nextQuestion('advanced')">応用</button>
-  <button onclick="nextQuestion('performance_debt')">業績・借入状況</button>
-  <button onclick="nextQuestion('rates_macro')">金利・経済</button>
-</div>
+    <div class="category-buttons">
+      <button onclick="nextQuestion('random')">ランダム</button>
+      <button onclick="nextQuestion('basic')">基礎</button>
+      <button onclick="nextQuestion('advanced')">応用</button>
+      <button onclick="nextQuestion('performance_debt')">業績・借入状況</button>
+      <button onclick="nextQuestion('rates_macro')">金利・経済</button>
+    </div>
 
-<textarea id="answer" placeholder="ここに回答を入力してください"></textarea>
+    <textarea id="answer" placeholder="ここに回答を入力してください"></textarea>
 
     <button onclick="gradeAnswer()">採点する</button>
-    <button onclick="nextQuestion()">次の問題</button>
+    <button onclick="nextQuestion('random')">次の問題</button>
 
     <div class="result" id="result">回答すると、ここに採点結果が表示されます。</div>
   </div>
@@ -314,153 +312,58 @@
     let exp = Number(localStorage.getItem("exp")) || 0;
     let level = Number(localStorage.getItem("level")) || 1;
 
+    const titles = [
+      { level: 1, name: "見習い財務部員｜電卓を握りし者" },
+      { level: 2, name: "銀行面談ビギナー｜沈黙を恐れぬ者" },
+      { level: 3, name: "借入残高メモ職人｜数字を探す旅人" },
+      { level: 4, name: "資金繰り見張り番｜支払日を忘れない者" },
+      { level: 5, name: "TIBORの入口に立つ者" },
+      { level: 6, name: "短プラの気配を感じる者" },
+      { level: 7, name: "銀行員の本音翻訳係" },
+      { level: 8, name: "コベナンツ見習い監視人" },
+      { level: 9, name: "営業CFを信じる者" },
+      { level: 10, name: "金利交渉の小太刀使い" },
+      { level: 20, name: "CFO候補｜まだ名刺は普通" },
+      { level: 30, name: "財務参謀｜Excelと対話する者" },
+      { level: 40, name: "資金繰り仙人｜月末を越えし者" },
+      { level: 50, name: "CFO前夜｜銀行団がざわつく存在" },
+      { level: 75, name: "返済原資を語る者" },
+      { level: 100, name: "伝説の財務部員｜銀行団を統べる者" }
+    ];
+
+    const bonusTitles = [
+      "本日の肩書き：支払予定表の守護者",
+      "本日の肩書き：銀行員の眉間を読む者",
+      "本日の肩書き：金利上昇局面のサバイバー",
+      "本日の肩書き：BSの森を歩く者",
+      "本日の肩書き：PLとCFの通訳者",
+      "本日の肩書き：借入一覧の整理整頓係長",
+      "本日の肩書き：数字で語る練習生",
+      "本日の肩書き：自己資本比率をそっと見守る者",
+      "本日の肩書き：担保余力の観察者",
+      "本日の肩書き：銀行面談で汗をかきながら成長する男"
+    ];
+
     function updateStatus() {
       if (isNaN(exp)) exp = 0;
       if (isNaN(level)) level = 1;
 
       document.getElementById("exp").textContent = exp;
       document.getElementById("level").textContent = level;
-      document.getElementById("expFill").style.width = exp + "%";
+      document.getElementById("expFill").style.width = Math.min(exp, 100) + "%";
 
-      const titles = [
-  { level: 1, name: "見習い財務部員｜電卓を握りし者" },
-  { level: 2, name: "銀行面談ビギナー｜沈黙を恐れぬ者" },
-  { level: 3, name: "借入残高メモ職人｜数字を探す旅人" },
-  { level: 4, name: "資金繰り見張り番｜支払日を忘れない者" },
-  { level: 5, name: "TIBORの入口に立つ者" },
-  { level: 6, name: "短プラの気配を感じる者" },
-  { level: 7, name: "銀行員の本音翻訳係" },
-  { level: 8, name: "コベナンツ見習い監視人" },
-  { level: 9, name: "営業CFを信じる者" },
-  { level: 10, name: "金利交渉の小太刀使い" },
+      let title = titles[0].name;
 
-  { level: 11, name: "自己資本比率を気にし始めた男" },
-  { level: 12, name: "EBITDA倍率の門番" },
-  { level: 13, name: "メインバンク懐柔士" },
-  { level: 14, name: "資金ショート予防士" },
-  { level: 15, name: "銀行面談の場数王" },
-  { level: 16, name: "財務制限条項ウォッチャー" },
-  { level: 17, name: "変動金利に怯えぬ者" },
-  { level: 18, name: "固定金利との距離感を知る者" },
-  { level: 19, name: "試算表を読む夜の番人" },
-  { level: 20, name: "CFO候補｜まだ名刺は普通" },
+      for (const t of titles) {
+        if (level >= t.level) {
+          title = t.name;
+        }
+      }
 
-  { level: 21, name: "銀行格付けを気にして眠れぬ者" },
-  { level: 22, name: "DSCRの森を彷徨う者" },
-  { level: 23, name: "BSとPLを両手に持つ男" },
-  { level: 24, name: "減価償却費を愛し始めた者" },
-  { level: 25, name: "銀行員を少し安心させる者" },
-  { level: 26, name: "借換タイミング観測士" },
-  { level: 27, name: "返済スケジュール整理大臣" },
-  { level: 28, name: "短期借入ローテーション管理人" },
-  { level: 29, name: "銀行提出資料の最終確認係" },
-  { level: 30, name: "財務参謀｜Excelと対話する者" },
+      const todayIndex = new Date().getDate() % bonusTitles.length;
 
-  { level: 31, name: "金融機関別金利比較オタク" },
-  { level: 32, name: "TONAを語り始める者" },
-  { level: 33, name: "借入本数が増えても冷静な者" },
-  { level: 34, name: "メガバンク対応訓練兵" },
-  { level: 35, name: "地方銀行との距離感マスター" },
-  { level: 36, name: "金利1%上昇試算士" },
-  { level: 37, name: "資金繰り表を毎日眺める者" },
-  { level: 38, name: "運転資金の流れを読む男" },
-  { level: 39, name: "設備投資回収年数ウォッチャー" },
-  { level: 40, name: "資金繰り仙人｜月末を越えし者" },
-
-  { level: 41, name: "銀行面談前に深呼吸する者" },
-  { level: 42, name: "コミットメントライン交渉人" },
-  { level: 43, name: "営業利益率に敏感な者" },
-  { level: 44, name: "金利スプレッド研究家" },
-  { level: 45, name: "試算表提出スピードスター" },
-  { level: 46, name: "長期借入バランサー" },
-  { level: 47, name: "借入依存度を恐れ始めた者" },
-  { level: 48, name: "銀行団説明会サバイバー" },
-  { level: 49, name: "格付資料の守護者" },
-  { level: 50, name: "CFO前夜｜銀行団がざわつく存在" },
-
-  { level: 51, name: "銀行員の雑談にも意味を感じる者" },
-  { level: 52, name: "財務分析の沼に沈み始めた男" },
-  { level: 53, name: "固定費削減アイデア錬成師" },
-  { level: 54, name: "担保余力を見抜く者" },
-  { level: 55, name: "キャッシュフロー魔術師見習い" },
-  { level: 56, name: "コベナンツ違反を恐れる夜の民" },
-  { level: 57, name: "財務部会議で静かに頷く者" },
-  { level: 58, name: "借入契約書の読破者" },
-  { level: 59, name: "メインバンクとの空気を読む者" },
-  { level: 60, name: "資金調達クエスト中級者" },
-
-  { level: 61, name: "銀行面談で沈黙を操る者" },
-  { level: 62, name: "資金需要予測の預言者" },
-  { level: 63, name: "キャッシュ残高監視AI" },
-  { level: 64, name: "為替と原油価格に怯える者" },
-  { level: 65, name: "試算表レビュー職人" },
-  { level: 66, name: "財務KPI収集マシーン" },
-  { level: 67, name: "BS改善への執念を持つ者" },
-  { level: 68, name: "借入条件変更の交渉士" },
-  { level: 69, name: "銀行員の質問を先読みする男" },
-  { level: 70, name: "キャッシュコンバージョンサイクル監視官" },
-
-  { level: 71, name: "資金ショート回避の達人" },
-  { level: 72, name: "金融情勢ニュース収集兵" },
-  { level: 73, name: "金利改定通知に震えぬ者" },
-  { level: 74, name: "DSCRの化身" },
-  { level: 75, name: "返済原資を語る者" },
-  { level: 76, name: "銀行内部格付け予測士" },
-  { level: 77, name: "運転資金を生み出す者" },
-  { level: 78, name: "財務分析グラフ愛好家" },
-  { level: 79, name: "資金調達戦略の設計者" },
-  { level: 80, name: "実質CFO補佐" },
-
-  { level: 81, name: "銀行員から資料提出を急かされぬ者" },
-  { level: 82, name: "設備投資ROIハンター" },
-  { level: 83, name: "営業CF黒字維持勢" },
-  { level: 84, name: "借入ポートフォリオ構築士" },
-  { level: 85, name: "金融機関リレーションマスター" },
-  { level: 86, name: "資金繰り予測の未来視者" },
-  { level: 87, name: "融資審査の空気を読む者" },
-  { level: 88, name: "銀行説明資料ジェネレーター" },
-  { level: 89, name: "格付改善に人生を賭ける者" },
-  { level: 90, name: "財務道場 四天王候補" },
-
-  { level: 91, name: "銀行員を安心させる微笑みを持つ者" },
-  { level: 92, name: "資金調達イベント上級攻略者" },
-  { level: 93, name: "金融市場ウォッチャー" },
-  { level: 94, name: "返済計画の芸術家" },
-  { level: 95, name: "借入条件最適化エンジニア" },
-  { level: 96, name: "財務戦略の黒幕" },
-  { level: 97, name: "銀行交渉の修羅" },
-  { level: 98, name: "実質メインバンク側の人" },
-  { level: 99, name: "CFO覚醒前夜" },
-  { level: 100, name: "伝説の財務部員｜銀行団を統べる者" }
-];
-
-let title = titles[0].name;
-
-for (const t of titles) {
-  if (level >= t.level) {
-    title = t.name;
-  }
-}
-
-const bonusTitles = [
-  "本日の肩書き：支払予定表の守護者",
-  "本日の肩書き：銀行員の眉間を読む者",
-  "本日の肩書き：金利上昇局面のサバイバー",
-  "本日の肩書き：BSの森を歩く者",
-  "本日の肩書き：PLとCFの通訳者",
-  "本日の肩書き：借入一覧の整理整頓係長",
-  "本日の肩書き：数字で語る練習生",
-  "本日の肩書き：自己資本比率をそっと見守る者",
-  "本日の肩書き：担保余力の観察者",
-  "本日の肩書き：銀行面談で汗をかきながら成長する男"
-];
-
-const todayIndex = new Date().getDate() % bonusTitles.length;
-
-document.getElementById("title").innerHTML =
-  `${title}<br><span class="title-flavor">${bonusTitles[todayIndex]}</span>`;
-
-      document.getElementById("title").textContent = title;
+      document.getElementById("title").innerHTML =
+        `${title}<br><span class="title-flavor">${bonusTitles[todayIndex]}</span>`;
 
       localStorage.setItem("exp", exp);
       localStorage.setItem("level", level);
@@ -476,59 +379,66 @@ document.getElementById("title").innerHTML =
     }
 
     async function showQuestion(type = "random") {
-  document.getElementById("question").textContent =
-    "AIが問題を生成中です...";
+      document.getElementById("question").textContent =
+        "AIが問題を生成中です...";
 
-  document.getElementById("trainerImage").src =
-    "img/trainer_normal.png";
+      document.getElementById("trainerImage").src =
+        "img/trainer_normal.png";
 
-  try {
-    const response = await fetch(
-      `https://zaimu-dojo.vercel.app/api/question?type=${type}`
-    );
+      try {
+        const response = await fetch(
+          `https://zaimu-dojo.vercel.app/api/question?type=${type}`
+        );
 
-    const data = await response.json();
-    currentQuestion = data;
+        const data = await response.json();
 
-    const modeLabels = {
-      basic: "基礎問題",
-      advanced: "応用問題",
-      performance_debt: "業績・借入状況",
-      rates_macro: "金利・経済",
-      random: "ランダム"
-    };
+        if (!response.ok) {
+          throw new Error(data.error || "問題生成に失敗しました");
+        }
 
-    const modeLabel = modeLabels[data.mode] || modeLabels[type] || "ランダム";
-    const modeClass = data.mode === "advanced" ? "advanced" : "basic";
+        currentQuestion = data;
 
-    document.getElementById("question").innerHTML =
-      `
-      <span class="mode-badge ${modeClass}">${modeLabel}</span>
+        const modeLabels = {
+          basic: "基礎",
+          advanced: "応用",
+          performance_debt: "業績・借入状況",
+          rates_macro: "金利・経済",
+          random: "ランダム"
+        };
 
-      <div style="margin-bottom:10px;">
-        <strong>カテゴリ：</strong>${data.category}
-        &nbsp;&nbsp;
-        <strong>難易度：</strong>${data.difficulty}
-      </div>
+        const mode = data.mode || type;
+        const modeLabel = modeLabels[mode] || modeLabels[type] || "ランダム";
+        const modeClass = modeLabels[mode] ? mode : "random";
 
-      <div style="font-size:18px; margin-bottom:12px;">
-        ${data.question}
-      </div>
+        document.getElementById("question").innerHTML =
+          `
+          <span class="mode-badge ${modeClass}">${modeLabel}</span>
 
-      <div class="hint-box">
-        💡 ヒント：${data.hint}
-      </div>
-      `;
+          <div style="margin-bottom:10px;">
+            <strong>カテゴリ：</strong>${data.category || ""}
+            &nbsp;&nbsp;
+            <strong>難易度：</strong>${data.difficulty || ""}
+          </div>
 
-    document.getElementById("answer").value = "";
-    document.getElementById("result").textContent =
-      "回答すると、ここに採点結果が表示されます。";
+          <div style="font-size:18px; margin-bottom:12px;">
+            ${data.question || ""}
+          </div>
 
-  } catch (error) {
-    document.getElementById("question").textContent =
-      "問題生成エラー：" + error.message;
-  }
-}
+          <div class="hint-box">
+            💡 ヒント：${data.hint || ""}
+          </div>
+          `;
+
+        document.getElementById("answer").value = "";
+        document.getElementById("result").textContent =
+          "回答すると、ここに採点結果が表示されます。";
+
+      } catch (error) {
+        document.getElementById("question").textContent =
+          "問題生成エラー：" + error.message;
+      }
+    }
+
     async function gradeAnswer() {
       const answer = document.getElementById("answer").value;
 
@@ -578,6 +488,7 @@ document.getElementById("title").innerHTML =
         } else {
           image = "img/trainer_bad.png";
         }
+
         document.getElementById("trainerImage").src = image;
 
         const multiplier = difficultyMultiplier(currentQuestion.difficultyLevel);
@@ -612,7 +523,7 @@ document.getElementById("title").innerHTML =
 
           <h2>スコア：${score}点 / 100点</h2>
           <p><strong>獲得EXP：</strong>${gainedExp} EXP</p>
-          <p><strong>問題タイプ：</strong>${currentQuestion.mode === "advanced" ? "応用問題" : "基礎問題"}</p>
+          <p><strong>問題タイプ：</strong>${currentQuestion.mode || "random"}</p>
           <p><strong>難易度倍率：</strong>${multiplier}倍</p>
 
           <h3>■ TAKAさんの回答要約</h3>
@@ -645,11 +556,11 @@ document.getElementById("title").innerHTML =
     }
 
     function nextQuestion(type = "random") {
-  showQuestion(type);
-}
+      showQuestion(type);
+    }
 
     updateStatus();
-    showQuestion();
+    showQuestion("random");
   </script>
 </body>
 </html>
