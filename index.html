@@ -92,17 +92,7 @@
   </div>
 
   <script>
-const questions = [
-  {
-    text: "銀行から『最近の資金繰り状況はいかがですか？』と聞かれました。30秒で回答してください。"
-  },
-  {
-    text: "『借入金利はどのように決まりますか？』と聞かれました。"
-  },
-  {
-    text: "『コベナンツとは何ですか？』と聞かれました。"
-  }
-];
+let currentQuestion = null;
 
 let currentQuestionIndex = 0;
 let exp = Number(localStorage.getItem("exp")) || 0;
@@ -117,15 +107,54 @@ function updateStatus() {
   localStorage.setItem("level", level);
 }
 
-function showQuestion() {
+async function showQuestion() {
 
   document.getElementById("question").textContent =
-    questions[currentQuestionIndex].text;
+    "AIが問題を生成中です...";
 
-  document.getElementById("answer").value = "";
+  try {
 
-  document.getElementById("result").textContent =
-    "回答すると、ここに採点結果が表示されます。";
+    const response = await fetch(
+      "https://zaimu-dojo.vercel.app/api/question"
+    );
+
+    const data = await response.json();
+
+    currentQuestion = data;
+
+    document.getElementById("question").innerHTML =
+      `
+      <div style="margin-bottom:10px;">
+        <strong>カテゴリ：</strong>${data.category}
+        &nbsp;&nbsp;
+        <strong>難易度：</strong>${data.difficulty}
+      </div>
+
+      <div style="font-size:20px; margin-bottom:12px;">
+        ${data.question}
+      </div>
+
+      <div style="
+        background:#fff8dc;
+        padding:10px;
+        border-radius:8px;
+        font-size:14px;
+      ">
+        💡 ヒント：${data.hint}
+      </div>
+      `;
+
+    document.getElementById("answer").value = "";
+
+    document.getElementById("result").textContent =
+      "回答すると、ここに採点結果が表示されます。";
+
+  }
+  catch (error) {
+
+    document.getElementById("question").textContent =
+      "問題生成エラー：" + error.message;
+  }
 }
 
 async function gradeAnswer() {
@@ -134,7 +163,7 @@ async function gradeAnswer() {
     document.getElementById("answer").value;
 
   const question =
-    questions[currentQuestionIndex].text;
+  currentQuestion.question;
 
   if (answer.trim() === "") {
 
@@ -215,10 +244,6 @@ ${result.modelAnswer}`;
 }
 
 function nextQuestion() {
-
-  currentQuestionIndex =
-    (currentQuestionIndex + 1) % questions.length;
-
   showQuestion();
 }
 
