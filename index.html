@@ -138,7 +138,7 @@
 <body>
   <div class="dojo">
     <div class="top">
-      <img id="trainerImage" src="img/trainer_normal.png" alt="トレーナー画像">
+      <img id="trainerImage" src="img/trainer_normal.png">
       <div class="status">
         <h1>財務道場</h1>
         <p>レベル：<span id="level">1</span></p>
@@ -264,23 +264,19 @@ async function gradeAnswer() {
 
     const score = result.score;
 
-    let image = "trainer_normal.png";
+    let image = "img/trainer_normal.png";
 
-    if (score >= 90) {
-      image = "trainer_great.png";
-    }
-    else if (score >= 75) {
-      image = "trainer_good.png";
-    }
-    else if (score >= 55) {
-      image = "trainer_soso.png.jpeg";
-    }
-    else {
-      image = "trainer_bad.png.png";
-    }
+if (score >= 90) {
+  image = "img/trainer_great.png";
+} else if (score >= 75) {
+  image = "img/trainer_good.png";
+} else if (score >= 55) {
+  image = "img/trainer_soso.png";
+} else {
+  image = "img/trainer_bad.png";
+}
 
-    document.getElementById("trainerImage").src = image;
-
+document.getElementById("trainerImage").src = image;
     exp += Math.round(score / 5);
 
     if (exp >= 100) {
