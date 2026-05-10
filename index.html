@@ -273,7 +273,7 @@
 <body>
   <div class="dojo">
     <div class="top">
-      <img id="trainerImage" src="img/trainer_normal.png" alt="トレーナー画像">
+      <img id="trainerImage" src="img/trainer_normal2.png" alt="トレーナー画像">
 
       <div class="status">
         <h1>財務道場</h1>
@@ -383,7 +383,7 @@
         "AIが問題を生成中です...";
 
       document.getElementById("trainerImage").src =
-        "img/trainer_normal.png";
+        "img/trainer_normal2.png";
 
       try {
         const response = await fetch(
@@ -478,7 +478,7 @@
 
         const score = Number(result.score) || 0;
 
-        let image = "img/trainer_normal.png";
+        let image = "img/trainer_normal2.png";
         if (score >= 90) {
           image = "img/trainer_great.png";
         } else if (score >= 75) {
